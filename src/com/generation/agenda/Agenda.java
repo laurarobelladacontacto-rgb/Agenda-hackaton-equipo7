@@ -1,46 +1,75 @@
 package com.generation.agenda;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class Agenda {
-    List<Contacto> agenda;
+    private List<Contacto> agenda;
+    private int capacidadMaxima;
 
-    /* Metodo AñadirContacto : valida por medio de un if si agenda está llena y si existe el contacto, por medio de los métodos que creamos.
-    si cumple esta condición se agrega un nuevo contacto a la agenda, caso contrario manda mensaje de "la agenda está llena" o "el contacto ya existe"
-     */
+    public Agenda() {
+        this(10);
+    }
+
+    public Agenda(int capacidadMaxima) {
+        if (capacidadMaxima < 0) {
+            throw new IllegalArgumentException("La capacidad debe ser mayor o igual a cero.");
+        }
+        this.capacidadMaxima = capacidadMaxima;
+        this.agenda = new ArrayList<>();
+    }
+
     public void anadirContacto(Contacto contacto) {
-        if (agendaLlena(this.agenda) && existeContacto(contacto)) {
-            agenda.add(contacto);
+        if (contacto == null) {
+            throw new IllegalArgumentException("El contacto es obligatorio.");
+        }
+        int indice = buscarIndice(contacto);
+        if (indice >= 0) {
+            System.out.println("El contacto ya existe.");
+        } else if (agendaLlena()) {
+            System.out.println("La agenda está llena. No hay espacio disponible.");
         } else {
-            System.out.println("La agenda está llena o ya existe el contacto.");
+            int posicionInsercion = -indice - 1;
+            agenda.add(posicionInsercion, contacto);
+            System.out.println("Contacto añadido correctamente.");
         }
     }
 
-    private boolean agendaLlena (List<Contacto> agenda) {
-        return agenda.size() <= 10;
+    public void añadirContacto(Contacto contacto) {
+        anadirContacto(contacto);
+    }
+
+    public boolean agendaLlena () {
+        return agenda.size() >= capacidadMaxima;
     }
 
     private int buscarIndice(String nombre, String apellido) {
-        for (int i = 0; i < agenda.size(); i++) {
-            if (agenda.get(i).coincide(nombre, apellido)) {
-                return i;
-            }
+        int indice = -1;
+        if (nombre != null && apellido != null && !nombre.isBlank() && !apellido.isBlank()) {
+            indice = buscarIndice(new Contacto(nombre, apellido, ""));
         }
-        return -1;
+        return indice;
     }
 
-    private boolean existeContacto (Contacto contacto) {
-        return contacto != null && buscarIndice(contacto.getNombre(), contacto.getApellido()) >= 0;
+    private int buscarIndice(Contacto contacto) {
+        Comparator<Contacto> ordenContactos = Comparator
+                .comparing(Contacto::getNombre, String.CASE_INSENSITIVE_ORDER)
+                .thenComparing(Contacto::getApellido, String.CASE_INSENSITIVE_ORDER);
+        return Collections.binarySearch(agenda, contacto, ordenContactos);
+    }
+
+    public boolean existeContacto (Contacto contacto) {
+        return contacto != null && buscarIndice(contacto) >= 0;
     }
 
     public void listarContactos() {
-        agenda.sort(Comparator
-                .comparing(Contacto::getNombre, String.CASE_INSENSITIVE_ORDER)
-                .thenComparing(Contacto::getApellido, String.CASE_INSENSITIVE_ORDER));
-        for(int i = 0; i < agenda.size(); i++) {
-            agenda.get(i).getNombre();
-            System.out.println(agenda.get(i).getNombre() + " " + agenda.get(i).getApellido() + " - " + agenda.get(i).getTelefono());
+        if (agenda.isEmpty()) {
+            System.out.println("La agenda está vacía.");
+        }
+        for (Contacto contacto : agenda) {
+            System.out.println(contacto.getNombre() + " " + contacto.getApellido() + " - " + contacto.getTelefono());
         }
     }
 
@@ -53,10 +82,23 @@ public class Agenda {
         }
     }
 
+    public void buscaContacto(String nombre, String apellido) {
+        buscarContacto(nombre, apellido);
+    }
+
+    public void eliminarContacto(Contacto contacto) {
+        if (contacto == null) {
+            System.out.println("El usuario no se encuentra.");
+        } else {
+            eliminarContacto(contacto.getNombre(), contacto.getApellido());
+        }
+    }
+
     public void eliminarContacto (String nombre, String apellido) {
         int indice = buscarIndice(nombre, apellido);
         if (indice >= 0) {
             agenda.remove(indice);
+            System.out.println("Contacto eliminado correctamente.");
         }else {
             System.out.println("El usuario no se encuentra.");
         }
@@ -66,12 +108,17 @@ public class Agenda {
         int indice = buscarIndice(nombre, apellido);
         if (indice >= 0) {
             agenda.get(indice).setTelefono(nuevoTelefono);
+            System.out.println("Teléfono modificado correctamente.");
         } else {
             System.out.println("No se encontró el contacto.");
         }
     }
 
     public void espaciosLibres () {
-        System.out.println("Espacios libres: " + (10 - agenda.size()));
+        System.out.println("Espacios libres: " + espacioLibres());
+    }
+
+    public int espacioLibres() {
+        return capacidadMaxima - agenda.size();
     }
 }
