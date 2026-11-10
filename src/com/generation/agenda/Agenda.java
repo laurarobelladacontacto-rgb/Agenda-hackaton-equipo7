@@ -21,7 +21,7 @@ public class Agenda {
         this.agenda = new ArrayList<>();
     }
 
-    public void anadirContacto(Contacto contacto) {
+    public void añadirContacto(Contacto contacto) {
         if (contacto == null) {
             throw new IllegalArgumentException("El contacto es obligatorio.");
         }
@@ -35,10 +35,6 @@ public class Agenda {
             agenda.add(posicionInsercion, contacto);
             System.out.println("Contacto añadido correctamente.");
         }
-    }
-
-    public void añadirContacto(Contacto contacto) {
-        anadirContacto(contacto);
     }
 
     public boolean agendaLlena () {
