@@ -4,7 +4,8 @@ public class Usuario extends Persona{
     private Agenda agenda;
 
     public Usuario (String nombre, String apellido) {
-        this(nombre, apellido, 10);
+        super(nombre, apellido);
+        this.agenda = new Agenda();
     }
 
     public Usuario(String nombre, String apellido, int capacidadMaxima) {

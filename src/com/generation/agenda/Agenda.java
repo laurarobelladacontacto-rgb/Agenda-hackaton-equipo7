@@ -69,17 +69,13 @@ public class Agenda {
         }
     }
 
-    public void buscarContacto (String nombre, String apellido) {
+    public void buscaContacto (String nombre, String apellido) {
         int indice = buscarIndice(nombre, apellido);
         if (indice < 0) {
             System.out.println("No existe usuario.");
         }else {
             System.out.println("El teléfono del usuario buscado es: " + agenda.get(indice).getTelefono());
         }
-    }
-
-    public void buscaContacto(String nombre, String apellido) {
-        buscarContacto(nombre, apellido);
     }
 
     public void eliminarContacto(Contacto contacto) {
